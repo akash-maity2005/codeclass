@@ -36,6 +36,10 @@ void insertAtEnd(Node** head, int value) {
 }
 
 void insertAtPos(Node** head, int value, int pos) {
+    if (pos < 0) {
+        printf("Invalid position.\n");
+        return;
+    }
     if (pos == 0) {
         insertAtBeg(head, value);
         return;
@@ -43,15 +47,19 @@ void insertAtPos(Node** head, int value, int pos) {
     Node* newNode = createNode(value);
     Node* temp = *head;
     int cnt = 0;
-    while (temp != NULL && cnt != pos - 1) {
+    
+    // Find the node at position pos-1
+    while (temp != NULL && cnt < pos - 1) {
         temp = temp->next;
         cnt++;
     }
+    
     if (temp == NULL) {
-        printf("Invalid position.\n");
+        printf("Invalid position. Position exceeds list length.\n");
         free(newNode);
         return;
     }
+    
     newNode->next = temp->next;
     temp->next = newNode;
 }
@@ -90,21 +98,30 @@ void deleteAtPos(Node** head, int pos) {
         printf("List is empty.\n");
         return;
     }
+    if (pos < 0) {
+        printf("Invalid position.\n");
+        return;
+    }
     if (pos == 0) {
         deleteAtBeg(head);
         return;
     }
+    
     Node *curr = *head, *prev = NULL;
     int cnt = 0;
+    
+    // Find the node at the specified position
     while (curr != NULL && cnt < pos) {
         prev = curr;
         curr = curr->next;
         cnt++;
     }
+    
     if (curr == NULL) {
-        printf("Invalid position.\n");
+        printf("Invalid position. Position exceeds list length.\n");
         return;
     }
+    
     prev->next = curr->next;
     free(curr);
 }
@@ -115,10 +132,25 @@ void display(Node* head) {
         return;
     }
     Node* temp = head;
+    printf("List: ");
     while (temp != NULL) {
-        printf("%d\n", temp->data);
+        printf("%d ", temp->data);
         temp = temp->next;
     }
+    printf("\n");
+}
+
+void freeList(Node** head) {
+    Node* current = *head;
+    Node* next;
+    
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+    
+    *head = NULL;
 }
 
 int main() {
@@ -170,5 +202,8 @@ int main() {
         }
     } while (choice != 8);
 
+    // Free all allocated memory before exiting
+    freeList(&head);
+    
     return 0;
 }
